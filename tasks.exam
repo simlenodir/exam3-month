@@ -1,0 +1,11 @@
+admin 'Ahmad' email 'nodirsmailov0@gmail.com' password 1221
+user 'Jasur' email 'farqiyoq@gmail.com' password 2222
+admin page admin login qilib kirishi va unga token berish 
+admin create bank 
+admin create company 
+admin users control
+banks table create
+company table create
+proect table create
+
+users page
