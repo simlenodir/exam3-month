@@ -25,7 +25,7 @@ select * from banks;
 `
 const choiceBankOfHome = 
 `
-select * from banks where replace(max_sum, ' ', '')::bigint >= $1 and max_year = $2 order by replace(max_sum, ' ', '')::bigint offset 0 limit 1 ; 
+    select * from banks where replace(max_sum, ' ', '')::bigint >= $1 and max_year = $2 order by replace(max_sum, ' ', '')::bigint offset 0 limit 1 ; 
 `
 
 export const FoundCompany = (compId) => fetchData(Found_Company, compId)
