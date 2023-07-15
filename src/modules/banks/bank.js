@@ -4,49 +4,66 @@ import { allBanks, createNewBank, deleteBank, foundPutBank } from "./model.js"
 export default {
     GET_ADMIN: async (req, res, next) => {
         const { id, role } = req
-
+        const { limit, page } = req.query 
+       
         if (role != 'admin') {
-            res.json('You have not access token')
+          return  res.json('You have not access token')
         }
-
-        const banks = await allBanks()
-
-        if (id && role == 'admin') {
-            res.json({
+        const banks = await allBanks().catch(err => next(new ErrorHandler(err.message, 500)))
+        const sortBanks = banks.slice((page -1)*limit, limit*page)
+          if (banks) {
+            return  res.json({
                 status: 200,
-                data: banks
+                data: sortBanks
+                
             })
+          }
+          return res.json({
+            message: "Banks is not found",
+            status: 400
+          })
+    },
+    GET_PAGES: async(req, res) => {
+
+        const { limit } = req.query 
+       
+        const banks = await allBanks().catch(err => next(new ErrorHandler(err.message, 500)))
+
+        const counts = Math.ceil(banks.length/limit)
+
+        let pagenatButtons = []
+        for (let i = 1; i <= counts; i++) {
+           pagenatButtons.push(i)
+        }    
+        if (counts) {
+            return  res.json({
+                status: 200,
+                data: pagenatButtons
+            }) 
         }
+
     },
     POST_BANK: async(req, res, next) =>{
-        const { id, role } = req
-
-        if (role != 'admin') {
-            res.json('You have not access token')
-        }
 
         const { name, max_sum, initial_percent, max_year} = req.body
         
         const newBanks = await createNewBank(name, max_sum, initial_percent, max_year)
 
-        if (id && role == 'admin') {
-            res.json({
+        if (newBanks) {
+           return res.json({
                 status: 200,
                 data: newBanks
             })
         }
     },
     UPDATE_BANK: async(req, res, next) => {
-        const { id, role } =req  
+
         const { bankId } = req.params
         const {name, max_sum, initial_percent, max_year} = req.body
         const UpdatedBank = await foundPutBank(name, max_sum, initial_percent, max_year, bankId).catch(err => next(new ErrorHandler(err.message, 503)))
 
-        if (role != 'admin') {
-            res.json('You have not access token')
-        }
        if ( UpdatedBank) {
-            res.status(200).json({
+           return res.status(200).json({
                 status: 200,
                 message: 'Updated succesfully'
             })
@@ -55,32 +72,16 @@ export default {
     },
     DELETE_BANK: async(req, res, next) => {
 
-        const { id, role } = req
         const { bankId } = req.params
-
-        try {
-            if (role != 'admin') {
-                res.json('You have not access token')
-            }else {
-                res.json(await deleteBank(bankId))
-            }
-
-        } catch (error) {
-            console.log(error)
-            next(new ErrorHandler(error.message))
-            res.sendStatus(500)
+        const deletedBank = await deleteBank(bankId).catch(err => next(new ErrorHandler(err.message ,500)))
+        
+        if (deletedBank) {
+            return res.json({
+                status: 200,
+                message: "Bank deleted successfully"
+            })
         }
 
-        
 
-        // const deletedBank = await deleteBank(bankId)
-        // res.json(await deleteBank(bankId))
-
-        // if (deletedBank) {
-        //     res.status(200).json({
-        //         deleteBank
-        //     })
-        // }
-        // next(new ErrorHandler('Something is not true', 400))
     }
 }

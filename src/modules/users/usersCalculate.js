@@ -37,7 +37,7 @@ export default {
 
         const [data] = await selectedRoom(roomId).catch(err => next (new ErrorHandler(err.message, 500)))
 
-        res.json(data)
+          return  res.json(data)
     },
     USERS_CALCULATE: async(req, res, next) => {
         const {year, square, sum} =req.query
@@ -54,7 +54,7 @@ export default {
         const periodOfTimeMonth = ((homePrice-initialSum) / (year * 12 )).toFixed(2)
         console.log(initialSum, periodOfTimeMonth, homePrice);
 
-        res.json({
+       return  res.json({
             data: choiceBank,
             price: homePrice,
             month: periodOfTimeMonth,
